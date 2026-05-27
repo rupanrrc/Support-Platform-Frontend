@@ -91,7 +91,9 @@ export function UserManagementPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">User management</h1>
-          <p className="mt-1 text-sm text-slate-600">Create and manage platform accounts (admin only)</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Create agent, manager, and admin accounts. Customers can sign up on the public registration page.
+          </p>
         </div>
         <Button onClick={() => setCreateOpen(true)}>Add user</Button>
       </div>

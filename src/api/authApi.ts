@@ -1,7 +1,18 @@
 import { axiosInstance } from "./axiosInstance";
 import type { LoginResponse, User } from "@/types/user";
 
+export interface RegistrationStatus {
+  open: boolean;
+  mode: "bootstrap" | "customer";
+  allowedRoles: string[];
+  message: string;
+}
+
 export const authApi = {
+  registrationStatus: () =>
+    axiosInstance
+      .get<RegistrationStatus>("/api/auth/registration-status")
+      .then((r) => r.data),
   login: (body: { email: string; password: string }) =>
     axiosInstance.post<LoginResponse>("/api/auth/login", body).then((r) => r.data),
 

@@ -2,6 +2,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { authApi } from "@/api/authApi";
 import { useAuthStore } from "@/stores/authStore";
 
+export function useRegistrationStatus() {
+  return useQuery({
+    queryKey: ["auth", "registration-status"],
+    queryFn: () => authApi.registrationStatus(),
+    staleTime: 60_000
+  });
+}
+
 export function useMe() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const accessToken = useAuthStore((s) => s.accessToken);

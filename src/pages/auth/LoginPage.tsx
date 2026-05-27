@@ -50,7 +50,7 @@ export function LoginPage() {
         <p className="text-slate-600">
           New installation?{" "}
           <Link to="/register" className="font-medium text-brand-600 hover:underline">
-            Create admin account
+            Create an account
           </Link>
         </p>
       }

@@ -3,6 +3,21 @@ import { useAuthStore } from "@/stores/authStore";
 
 const baseURL = import.meta.env.VITE_API_URL || "";
 
+/** Auth endpoints that must not send a stored JWT (avoids 401 on public register). */
+const PUBLIC_AUTH_PATHS = [
+  "/api/auth/login",
+  "/api/auth/register",
+  "/api/auth/refresh",
+  "/api/auth/forgot-password",
+  "/api/auth/reset-password",
+  "/api/auth/registration-status"
+] as const;
+
+function isPublicAuthRequest(url?: string) {
+  if (!url) return false;
+  return PUBLIC_AUTH_PATHS.some((path) => url.includes(path));
+}
+
 export const axiosInstance = axios.create({
   baseURL,
   headers: { "Content-Type": "application/json" },
@@ -10,6 +25,10 @@ export const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  if (isPublicAuthRequest(config.url)) {
+    return config;
+  }
+
   const token = useAuthStore.getState().accessToken;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -28,8 +47,7 @@ axiosInstance.interceptors.response.use(
       error.response?.status !== 401 ||
       !original ||
       original._retry ||
-      original.url?.includes("/api/auth/login") ||
-      original.url?.includes("/api/auth/refresh")
+      isPublicAuthRequest(original.url)
     ) {
       return Promise.reject(error);
     }

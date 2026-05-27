@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthCard } from "@/components/molecules/AuthCard";
 import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
-import { useRegister } from "@/hooks/useAuth";
+import { Spinner } from "@/components/atoms/Spinner";
+import { useRegister, useRegistrationStatus } from "@/hooks/useAuth";
 import { getApiErrorMessage } from "@/api/axiosInstance";
 import { getDashboardPath } from "@/utils/rolePaths";
 import { useAuthStore } from "@/stores/authStore";
@@ -13,6 +14,7 @@ import { PASSWORD_HINT, validatePassword } from "@/utils/passwordRules";
 export function RegisterPage() {
   const navigate = useNavigate();
   const register = useRegister();
+  const registrationStatus = useRegistrationStatus();
   const pushToast = useUiStore((s) => s.pushToast);
 
   const [name, setName] = useState("");
@@ -20,6 +22,10 @@ export function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const mode = registrationStatus.data?.mode;
+  const statusMessage = registrationStatus.data?.message;
+  const isBootstrap = mode === "bootstrap";
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -50,30 +56,48 @@ export function RegisterPage() {
     } catch (err) {
       const message = getApiErrorMessage(err);
       pushToast({ type: "error", message });
-      if (message.toLowerCase().includes("admin")) {
-        setErrors({
-          form: "Registration is limited. Use seed credentials or ask an administrator to create your account."
-        });
-      }
+      setErrors({ form: message });
     }
   };
 
+  if (registrationStatus.isLoading) {
+    return (
+      <AuthCard title="Create account" subtitle="Loading registration options…">
+        <div className="flex justify-center py-8">
+          <Spinner />
+        </div>
+      </AuthCard>
+    );
+  }
+
+  const title = isBootstrap ? "Create administrator account" : "Create customer account";
+  const submitLabel = isBootstrap ? "Create administrator account" : "Create account";
+
   return (
     <AuthCard
-      title="Create account"
-      subtitle="On a new installation, the first account becomes the platform administrator."
+      title={title}
+      subtitle={statusMessage}
       footer={
-        <p className="text-slate-600">
+        <p className="text-muted-foreground">
           Already have an account?{" "}
-          <Link to="/login" className="font-medium text-brand-600 hover:underline">
+          <Link to="/login" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
             Sign in
           </Link>
         </p>
       }
     >
+      {!isBootstrap ? (
+        <p className="mb-4 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+          <strong className="text-foreground">Need agent or manager access?</strong> Ask your organization&apos;s
+          administrator to create your account under <strong>Admin → Users</strong>.
+        </p>
+      ) : null}
+
       <form onSubmit={handleSubmit} className="space-y-4">
         {errors.form ? (
-          <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">{errors.form}</p>
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
+            {errors.form}
+          </p>
         ) : null}
         <Input
           label="Full name"
@@ -101,7 +125,7 @@ export function RegisterPage() {
           error={errors.password}
           autoComplete="new-password"
         />
-        <p className="-mt-2 text-xs text-slate-500">{PASSWORD_HINT}</p>
+        <p className="-mt-2 text-xs text-muted-foreground">{PASSWORD_HINT}</p>
         <Input
           label="Confirm password"
           name="confirmPassword"
@@ -112,7 +136,7 @@ export function RegisterPage() {
           autoComplete="new-password"
         />
         <Button type="submit" className="w-full" loading={register.isPending}>
-          Create account
+          {submitLabel}
         </Button>
       </form>
     </AuthCard>
