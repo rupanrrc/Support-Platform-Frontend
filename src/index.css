@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 217 91% 60%;
+  }
+
+  .dark {
+    --background: 222 47% 7%;
+    --foreground: 210 40% 98%;
+    --card: 217 33% 12%;
+    --card-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --border: 217 25% 22%;
+    --input: 217 25% 22%;
+    --ring: 217 91% 60%;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-background text-foreground antialiased;
+  }
+
+  ::selection {
+    @apply bg-brand-100 text-brand-900;
+  }
+
+  .dark ::selection {
+    @apply bg-brand-900 text-brand-100;
+  }
+}
+
+/* Fallback: legacy slate/white utilities in dark mode (until all components use semantic tokens) */
+@layer utilities {
+  .dark .bg-white {
+    background-color: hsl(var(--card));
+  }
+  .dark .bg-white\/95 {
+    background-color: hsl(var(--card) / 0.95);
+  }
+  .dark .bg-slate-50 {
+    background-color: hsl(var(--background));
+  }
+  .dark .bg-slate-50\/80 {
+    background-color: hsl(var(--muted) / 0.8);
+  }
+  .dark .bg-slate-100 {
+    background-color: hsl(var(--muted));
+  }
+  .dark .hover\:bg-slate-100:hover {
+    background-color: hsl(var(--muted));
+  }
+  .dark .hover\:bg-slate-50:hover {
+    background-color: hsl(var(--muted));
+  }
+  .dark .border-slate-200,
+  .dark .border-slate-100 {
+    border-color: hsl(var(--border));
+  }
+  .dark .border-slate-300 {
+    border-color: hsl(var(--input));
+  }
+  .dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+  .dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+    border-color: hsl(var(--border));
+  }
+  .dark .text-slate-900,
+  .dark .text-slate-800,
+  .dark .text-slate-700 {
+    color: hsl(var(--foreground));
+  }
+  .dark .text-slate-600,
+  .dark .text-slate-500,
+  .dark .text-slate-400 {
+    color: hsl(var(--muted-foreground));
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
