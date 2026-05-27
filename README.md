@@ -1,3 +1,55 @@
+# Application Architecture (MERN Support Platform)
+
+## High-level diagram
+
+```mermaid
+flowchart TB
+  subgraph client [Frontend - React + Vite]
+    UI[Pages and Components]
+    RQ[React Query]
+    SOC[Socket.IO Client]
+    UI --> RQ
+    UI --> ZS
+    UI --> SOC
+  end
+
+  subgraph server [Backend - Node + Express]
+    API[REST API /api/*]
+    AUTH[JWT Auth Middleware]
+    RBAC[Role Guards]
+    SVC[Domain Services]
+    SIO[Socket.IO Server]
+    SLA[SLA Monitor 60s]
+    API --> AUTH --> RBAC --> SVC
+    SVC --> SIO
+    SLA --> SVC
+  end
+
+  subgraph data [MongoDB]
+    DB[(Users Teams Tickets Messages Notifications AuditLogs)]
+  end
+
+  RQ -->|HTTP Bearer JWT| API
+  SOC -->|WS auth token| SIO
+  SVC --> DB
+```
+
+## Request flow (ticket update)
+
+```mermaid
+sequenceDiagram
+  participant Agent
+  participant API as Express API
+  participant DB as MongoDB
+  participant SIO as Socket.IO
+
+  Agent->>API: PATCH /api/tickets/:id/resolve
+  API->>DB: Update ticket + audit log
+  API->>SIO: emit ticket:resolved
+  SIO-->>Agent: ticket:resolved (if in room)
+  SIO-->>Customer: ticket:resolved (user room)
+  API-->>Agent: 200 JSON ticket
+```
 # Support Platform — Frontend
 
 React 18 + TypeScript + Vite + TailwindCSS + React Query + React Router.
@@ -91,8 +143,34 @@ Socket.IO connects when you enter any protected route (JWT in `handshake.auth.to
 
 **Production / explicit API host:**
 
-```env
-VITE_API_URL=http://localhost:5000
-# optional override if sockets use a different origin:
+### Demo accounts
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@example.com | Admin123!@# |
+| Manager | manager@example.com | Manager123!@# |
+| Agent | agent@example.com | Agent123!@# |
+| Customer | customer@example.com | Customer123!@# |
+
+
+### Demo login
+
+- **Customer**: `customer@example.com` / `Customer123!@#`
+- **Agent**: `agent@example.com` / `Agent123!@#`
+- **Manager**: `manager@example.com` / `Manager123!@#`
+- **Admin**: `admin@example.com` / `Admin123!@#`
+
+### Demo flow
+
+Best experience: open **two browser windows** (normal + incognito) so you can show real-time updates.
+
+1. **Customer** logs in → Sidebar → **New ticket**
+2. Create a ticket (example): title “Cannot reset password”, priority “high”, category “technical”
+3. On ticket detail, send a message: “I tried twice on Chrome.”
+4. **Agent** logs in (incognito) → **Queue** → open the new ticket
+5. Click **Assign** (assign to self/team) → reply to customer → add an **Internal note** (staff-only)
+6. Click **Resolve** (then optionally **Close**)
+7. **Manager** logs in → **Escalations** + **Analytics** (volume, SLA, agent/team performance)
+8. **Admin** logs in → **Users** / **Teams** → **Audit logs** to show traceability
 # VITE_SOCKET_URL=http://localhost:5000
 ```
