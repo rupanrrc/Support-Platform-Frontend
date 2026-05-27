@@ -172,5 +172,6 @@ Best experience: open **two browser windows** (normal + incognito) so you can sh
 6. Click **Resolve** (then optionally **Close**)
 7. **Manager** logs in → **Escalations** + **Analytics** (volume, SLA, agent/team performance)
 8. **Admin** logs in → **Users** / **Teams** → **Audit logs** to show traceability
-# VITE_SOCKET_URL=http://localhost:5000
+
+Live Demo : http://13.233.183.185/
 ```
