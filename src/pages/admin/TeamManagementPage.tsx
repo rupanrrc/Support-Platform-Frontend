@@ -118,7 +118,10 @@ export function TeamManagementPage() {
         footer={
           <ModalActions
             onCancel={() => setCreateOpen(false)}
-            onConfirm={() => document.getElementById("create-team-form")?.requestSubmit()}
+            onConfirm={() => {
+              const form = document.getElementById("create-team-form") as HTMLFormElement | null;
+              form?.requestSubmit();
+            }}
             loading={createTeam.isPending}
           />
         }

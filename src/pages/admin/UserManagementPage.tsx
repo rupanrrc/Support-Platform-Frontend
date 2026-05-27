@@ -177,7 +177,7 @@ export function UserManagementPage() {
         footer={
           <ModalActions
             onCancel={() => setCreateOpen(false)}
-            onConfirm={() => document.getElementById("create-user-form")?.requestSubmit()}
+            onConfirm={() => (document.getElementById("create-user-form") as HTMLFormElement)?.requestSubmit()}
             confirmLabel="Create"
             loading={createUser.isPending}
           />

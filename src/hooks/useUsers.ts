@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usersApi } from "@/api/usersApi";
-import type { User, UserRole } from "@/types/user";
+import type { UserRole } from "@/types/user";
 
 export function useUsersList(params?: {
   page?: number;
